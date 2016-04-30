@@ -1,5 +1,6 @@
 
 # Scrapyd-mongodb
+[![PyPI version](https://badge.fury.io/py/scrapyd-mongodb.svg)](https://badge.fury.io/py/scrapyd-mongodb)
 
 The scrapyd library is a fantastic open-source tool for management of spiders implemented using scrapy-framework.
 However, the builtin backend queue management library is implemented to work with SQLite,
