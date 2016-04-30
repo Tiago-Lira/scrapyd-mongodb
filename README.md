@@ -49,5 +49,5 @@ mongodb_port = 27017
 
 ## Contributing
 
-Having trouble? have suggestions?
+Having trouble? have suggestions?  
 Report bugs or suggestions on the issue tracker.
