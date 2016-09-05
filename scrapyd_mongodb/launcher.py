@@ -5,6 +5,7 @@ import sys
 import signal
 
 from twisted.internet import reactor
+from twisted.internet import error
 from twisted.python import log
 from scrapy.crawler import _get_spider_loader
 from scrapy.utils.project import get_project_settings
@@ -43,10 +44,16 @@ class Launcher(launcher.Launcher):
         self._set_timeout(pp)
 
     def terminate_process(self, process):
-        log.msg('Terminating "{}"'.format(process.job))
-        process.transport.signalProcess(signal.SIGTERM)
-        reactor.callLater(10, self.kill_process, process.pid)
+        try:
+            process.transport.signalProcess(signal.SIGTERM)
+            log.msg('Terminating "{}"'.format(process.job))
+            reactor.callLater(10, self.kill_process, process.pid)
+        except error.ProcessExitedAlready:
+            pass
 
     def kill_process(self, pid):
-        log.msg('Kill pid: {}'.format(pid))
-        os.kill(pid, signal.SIGKILL)
+        try:
+            os.kill(pid, signal.SIGKILL)
+            log.msg('Kill pid: {}'.format(pid))
+        except error.ProcessExitedAlready:
+            pass
