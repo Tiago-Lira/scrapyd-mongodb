@@ -9,6 +9,7 @@ from twisted.internet import error
 from twisted.python import log
 from scrapy.crawler import _get_spider_loader
 from scrapy.utils.project import get_project_settings
+from scrapy.utils.python import stringify_dict
 from scrapyd.utils import get_crawl_args
 from scrapyd import launcher
 from scrapyd import runner
@@ -31,12 +32,13 @@ class Launcher(launcher.Launcher):
                     timeout * 60, self.terminate_process, process)
 
     def _spawn_process(self, message, slot):
-        msg = message
+        msg = stringify_dict(message, keys_only=False)
         project = msg['_project']
         args = [sys.executable, '-m', self.runner, 'crawl']
         args += get_crawl_args(msg)
         e = self.app.getComponent(IEnvironment)
         env = e.get_environment(msg, slot)
+        env = stringify_dict(env, keys_only=False)
         pp = self.protocol_cls(slot, project, msg['_spider'], msg['_job'], env)
         pp.deferred.addBoth(self._process_finished, slot)
         reactor.spawnProcess(pp, sys.executable, args=args, env=env)
