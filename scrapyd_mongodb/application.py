@@ -7,7 +7,9 @@ from twisted.python import log
 
 from scrapy.utils.misc import load_object
 
-from scrapyd.interfaces import IEggStorage, IPoller, ISpiderScheduler, IEnvironment
+from scrapyd.interfaces import (
+    IEggStorage, IPoller, ISpiderScheduler, IEnvironment
+)
 from scrapyd.eggstorage import FilesystemEggStorage
 from scrapyd.environ import Environment
 from scrapyd.website import Root
@@ -32,14 +34,18 @@ def get_application(config):
     app.setComponent(ISpiderScheduler, scheduler)
     app.setComponent(IEnvironment, environment)
 
-    laupath = config.get('launcher', 'scrapyd.launcher.Launcher')
+    laupath = config.get('launcher', 'scrapyd_mongodb.launcher.Launcher')
     laucls = load_object(laupath)
     launcher = laucls(config, app)
 
     timer = TimerService(poll_interval, poller.poll)
-    webservice = TCPServer(http_port, server.Site(Root(config, app)), interface=bind_address)
-    log.msg(format='Scrapyd web console available at http://%(bind_address)s:%(http_port)s/',
-            bind_address=bind_address, http_port=http_port)
+    webservice = TCPServer(
+        http_port, server.Site(Root(config, app)),
+        interface=bind_address)
+    log.msg(format=(
+        'Scrapyd web console available at '
+        'http://%(bind_address)s:%(http_port)s/',
+    ), bind_address=bind_address, http_port=http_port)
 
     launcher.setServiceParent(app)
     timer.setServiceParent(app)
