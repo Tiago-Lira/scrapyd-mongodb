@@ -9,7 +9,7 @@ class MongoDBPriorityQueue(object):
     def __init__(self, config, collection):
         database_name = config.get('mongodb_name', 'scrapyd_mongodb')
         database_host = config.get('mongodb_host', 'localhost')
-        database_port = config.get('mongodb_port', 27017)
+        database_port = config.getint('mongodb_port', 27017)
 
         # Getting mongodb connection and collection
         self.conn = pymongo.MongoClient(host=database_host, port=database_port)

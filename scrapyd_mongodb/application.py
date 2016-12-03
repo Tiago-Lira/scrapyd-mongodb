@@ -42,10 +42,11 @@ def get_application(config):
     webservice = TCPServer(
         http_port, server.Site(Root(config, app)),
         interface=bind_address)
-    log.msg(format=(
+    log.info(
         'Scrapyd web console available at '
-        'http://%(bind_address)s:%(http_port)s/',
-    ), bind_address=bind_address, http_port=http_port)
+        'http://{bind_address}:{http_port}/',
+        bind_address=bind_address, http_port=http_port
+    )
 
     launcher.setServiceParent(app)
     timer.setServiceParent(app)
