@@ -5,15 +5,27 @@ import pymongo
 
 
 class MongoDBPriorityQueue(object):
-
     def __init__(self, config, collection):
         database_name = config.get('mongodb_name', 'scrapyd_mongodb')
         database_host = config.get('mongodb_host', 'localhost')
         database_port = config.getint('mongodb_port', 27017)
+        database_user = config.get('mongodb_user', None)
 
         # Getting mongodb connection and collection
-        self.conn = pymongo.MongoClient(host=database_host, port=database_port)
-        self.collection = self.conn.get_database(database_name).queue
+        if database_user:
+            database_password = config.get('mongodb_pass', None)
+            self.conn = pymongo.MongoClient(
+                'mongodb://%s:%s@%s:%s/%s' % (
+                    database_user, database_password,
+                    database_host, database_port, database_name
+                )
+            )
+        else:
+            self.conn = pymongo.MongoClient(
+                host=database_host, port=database_port
+            )
+
+        self.collection = self.conn.get_default_database().queue
 
     def put(self, message, priority=0.0):
         self.collection.insert_one({
