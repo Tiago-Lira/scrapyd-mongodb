@@ -25,7 +25,7 @@ class MongoDBPriorityQueue(object):
                 host=database_host, port=database_port
             )
 
-        self.collection = self.conn.get_default_database().queue
+        self.collection = self.conn.get_default_database()[collection]
 
     def put(self, message, priority=0.0):
         self.collection.insert_one({
