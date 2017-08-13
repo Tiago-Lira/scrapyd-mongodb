@@ -2,30 +2,43 @@
 
 import json
 import pymongo
+from configparser import NoOptionError
 
 
 class MongoDBPriorityQueue(object):
+
     def __init__(self, config, collection):
         database_name = config.get('mongodb_name', 'scrapyd_mongodb')
         database_host = config.get('mongodb_host', 'localhost')
         database_port = config.getint('mongodb_port', 27017)
-        database_user = config.get('mongodb_user', None)
+        database_user = self.get_optional_config(config, 'mongodb_user')
+        database_pwd = self.get_optional_config(config, 'mongodb_pass')
 
-        # Getting mongodb connection and collection
-        if database_user:
-            database_password = config.get('mongodb_pass', None)
-            self.conn = pymongo.MongoClient(
-                'mongodb://%s:%s@%s:%s/%s' % (
-                    database_user, database_password,
-                    database_host, database_port, database_name
-                )
+        if database_user and database_pwd:
+            conn_str = (
+                'mongodb://{db_user}:{db_pwd}@{db_host}:{db_port}/{db_name}'
+            ).format(
+                db_user=database_user,
+                db_pwd=database_pwd,
+                db_host=database_host,
+                db_port=database_port,
+                db_name=database_name,
             )
+            self.conn = pymongo.MongoClient(conn_str)
         else:
             self.conn = pymongo.MongoClient(
-                host=database_host, port=database_port
+                host=database_host,
+                port=database_port,
             )
 
-        self.collection = self.conn.get_default_database()[collection]
+        self.collection = self.conn.get_database(database_name)[collection]
+
+    @staticmethod
+    def get_optional_config(config, name):
+        try:
+            return config.get(name).replace('\'', '').replace('"', '')
+        except NoOptionError:
+            return None
 
     def put(self, message, priority=0.0):
         self.collection.insert_one({
