@@ -2,20 +2,18 @@
 # Scrapyd-mongodb
 [![PyPI version](https://badge.fury.io/py/scrapyd-mongodb.svg)](https://badge.fury.io/py/scrapyd-mongodb)
 
-The scrapyd library is a fantastic open-source tool for management of spiders implemented using scrapy-framework.
-However, the builtin backend queue management library is implemented to work with SQLite,
-which ends up being a problem when we need to scale.
+Scrapyd is a fantastic open-source library for management of crawlers using scrapy-framework.
+However, the builtin queue management is implemented to work using SQLite which ends up being a problem when we need to scale.
 
-This library is designed to replace the SQLite backend for MongoDB backend. In other words, all
-queue management will be done using MongoDB with the help of pymongo library.
+This library is designed to replace the SQLite backend by a MongoDB backend. In other words, all
+the queue management will be done using MongoDB.
 
 
 ## Install
 
-To use this library you need to have installed mongodb on the machine.
-The documentation can be found at: https://docs.mongodb.org/manual/installation/
+You need to have MongoDB installed before using this library. The documentation to install it can be found at: https://docs.mongodb.org/manual/installation/
 
-The `scrapyd-mongo` library is available at pypi:
+`scrapyd-mongo` is available at pypi:
 
 ```bash
 
@@ -25,9 +23,7 @@ $ pip install scrapyd-mongodb
 
 ## Config
 
-The configuration to use this library in your scrapy project is pretty simple.
-You just need to override the `application` in your `scrapy.cfg` file:
-
+To start using this library you just need to override the `application` option in your `scrapy.cfg` file:
 ```cfg
 
 [scrapyd]
@@ -36,13 +32,15 @@ application = scrapyd_mongodb.application.get_application
 
 ```
 
-If you want to customize the info to access the mongodb, you can add into your `scrapy.cfg` file:
+If you want to customize the access to the database, you can add into your `scrapy.cfg` file:
 
 ```cfg
 [scrapyd]
 mongodb_name = scrapyd_mongodb
 mongodb_host = 127.0.0.1
 mongodb_port = 27017
+mongodb_user = custom_user  # (Optional)
+mongodb_pass = custompwd  # (Optional)
 ...
 
 ```
